@@ -4,8 +4,12 @@ import LoadingIndicator from "../UI/LoadingIndicator.jsx";
 import ErrorBlock from "../UI/ErrorBlock.jsx";
 import EventItem from "./EventItem.jsx";
 import { fetchEvents } from "../../util/http.js";
+import { useState } from "react";
 
-export default function NewEventsSection() {
+import workshops from "../../workshops.js";
+
+export default function NewEventsSection() {  
+  const [events, setEvents] = useState(workshops);
   const { data, isPending, isError, error } = useQuery({
     queryKey: ["events", { max: 3 }],
     queryFn: ({ signal, queryKey }) => fetchEvents({ signal, ...queryKey[1] }), // queryKey[1] is { max: 3 }
@@ -34,6 +38,18 @@ export default function NewEventsSection() {
     content = (
       <ul className="events-list">
         {data.map((event) => (
+          <li key={event.id}>
+            <EventItem event={event} />
+          </li>
+        ))}
+      </ul>
+    );
+  }
+
+  if (!data) {
+    content = (
+      <ul className="events-list">
+        {events.map((event) => (
           <li key={event.id}>
             <EventItem event={event} />
           </li>
