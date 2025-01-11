@@ -1,17 +1,22 @@
 import { Link, Outlet, useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useState } from "react";
 
 import { fetchEvent, deleteEvent, queryClient } from "../../util/http.js";
 
+import workshops from "../../workshops.js";
+
 import Header from "../Header.jsx";
 import ErrorBlock from "../UI/ErrorBlock.jsx";
-import { useState } from "react";
 import Modal from "../UI/Modal.jsx";
 
 export default function EventDetails() {
   const [isDeleting, setIsDeleting] = useState(false);
   const params = useParams();
   const navigate = useNavigate();
+  const [events, setEvents] = useState(workshops);
+
+  console.log(params.id);
 
   const { data, isPending, isError, error } = useQuery({
     queryKey: ["events", params.id],
@@ -96,6 +101,39 @@ export default function EventDetails() {
               </time>
             </div>
             <p id="event-details-description">{data.description}</p>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  if (!data) {
+    const event = events.filter((event) => event.id === params.id);
+    console.log(event[0])
+    const formattedDate = new Date(event[0].date).toLocaleDateString("de-DE", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+    content = (
+      <>
+        <header>
+          <h1>{event[0].title}</h1>
+          <nav>
+            <button onClick={handleStartDelete}>Delete</button>
+            <Link to="edit">Edit</Link>
+          </nav>
+        </header>
+        <div id="event-details-content">
+          <img src={`process.env.PUBLIC_URL + ${event[0].image}`} alt={event[0].title} />
+          <div id="event-details-info">
+            <div>
+              <p id="event-details-location">{event[0].location}</p>
+              <time dateTime={`Todo-DateT$Todo-Time`}>
+                {formattedDate} @ {event[0].time}
+              </time>
+            </div>
+            <p id="event-details-description">{event[0].description}</p>
           </div>
         </div>
       </>
